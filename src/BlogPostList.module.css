@@ -1,0 +1,25 @@
+.blogPostList {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: 1fr;
+  padding: 10px;
+}
+
+@media (min-width: 769px) {
+  .blogPostList {
+    grid-template-columns: repeat(2, minmax(300px, 1fr));
+  }
+}
+
+@media (min-width: 1200px) {
+  .blogPostList {
+    grid-template-columns: repeat(3, minmax(300px, 1fr));
+  }
+}
+
+.noPosts {
+  font-size: 18px;
+  color: #666666;
+  text-align: center;
+  margin: 40px 0;
+}
