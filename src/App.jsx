@@ -1,52 +1,50 @@
-import React from 'react';
-import { Routes, Route, Link } from 'react-router-dom';
-import BlogPostDetail from './BlogPostDetail';
-
-const posts = [
-  {
-    id: '1',
-    title: 'My First Blog Post',
-    content: `<p>This is the full blog post. <a href="https://example.com">Example link</a></p>`,
-    author: 'Karthik',
-    date: '2023-01-01',
-  },
-];
+import React, { useState } from 'react';
+import BlogPostForm from './BlogPostForm';
 
 function App() {
+  const [posts, setPosts] = useState([]);
+  const [editingPost, setEditingPost] = useState(null);
+
+  const handleSubmit = (formData) => {
+    if (editingPost) {
+      // Edit existing post
+      const updatedPosts = posts.map((p, index) =>
+        index === editingPost.index ? formData : p
+      );
+      setPosts(updatedPosts);
+      setEditingPost(null);
+    } else {
+      // Add new post
+      setPosts([...posts, formData]);
+    }
+  };
+
+  const handleEdit = (index) => {
+    setEditingPost({ ...posts[index], index });
+  };
+
   return (
-    <Routes>
-      <Route
-        path="/"
-        element={
-          <div style={{ padding: '2rem' }}>
-            <h2>All Blog Posts</h2>
-            {posts.map((post) => (
-              <div key={post.id}>
-                <h3>
-                  <Link to={`/post/${post.id}`}>{post.title}</Link>
-                </h3>
-              </div>
-            ))}
-          </div>
-        }
-      />
-      <Route
-        path="/post/:id"
-        element={<BlogPostWrapper posts={posts} />}
-      />
-    </Routes>
+    <div style={{ padding: '20px' }}>
+      <h1>{editingPost ? 'Edit Post' : 'Create New Post'}</h1>
+      <BlogPostForm post={editingPost} onSubmit={handleSubmit} />
+
+      <h2>All Blog Posts</h2>
+      {posts.length === 0 ? (
+        <p>No posts yet</p>
+      ) : (
+        <ul>
+          {posts.map((post, index) => (
+            <li key={index} style={{ marginBottom: '10px' }}>
+              <h3>{post.title}</h3>
+              <p><strong>Author:</strong> {post.author}</p>
+              <p><strong>Date:</strong> {post.date}</p>
+              <button onClick={() => handleEdit(index)}>Edit</button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }
 
-function BlogPostWrapper({ posts }) {
-  const { id } = useParams();
-  const post = posts.find((p) => p.id === id);
-  return post ? (
-    <BlogPostDetail {...post} />
-  ) : (
-    <p style={{ padding: '2rem' }}>Blog post not found.</p>
-  );
-}
-
-import { useParams } from 'react-router-dom';
 export default App;
