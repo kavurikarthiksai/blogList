@@ -7,15 +7,24 @@ function App() {
 
   const handleSubmit = (formData) => {
     if (editingPost) {
-      // Edit existing post
       const updatedPosts = posts.map((p, index) =>
         index === editingPost.index ? formData : p
       );
       setPosts(updatedPosts);
       setEditingPost(null);
     } else {
-      // Add new post
       setPosts([...posts, formData]);
+    }
+  };
+
+  const handleDelete = (indexToDelete) => {
+    if (indexToDelete === undefined) return; // nothing to delete
+    const confirmed = window.confirm('Are you sure you want to delete this post?');
+    if (confirmed) {
+      setPosts(posts.filter((_, index) => index !== indexToDelete));
+      if (editingPost?.index === indexToDelete) {
+        setEditingPost(null);
+      }
     }
   };
 
@@ -26,23 +35,24 @@ function App() {
   return (
     <div style={{ padding: '20px' }}>
       <h1>{editingPost ? 'Edit Post' : 'Create New Post'}</h1>
-      <BlogPostForm post={editingPost} onSubmit={handleSubmit} />
-
-      <h2>All Blog Posts</h2>
-      {posts.length === 0 ? (
-        <p>No posts yet</p>
-      ) : (
-        <ul>
-          {posts.map((post, index) => (
-            <li key={index} style={{ marginBottom: '10px' }}>
-              <h3>{post.title}</h3>
-              <p><strong>Author:</strong> {post.author}</p>
-              <p><strong>Date:</strong> {post.date}</p>
-              <button onClick={() => handleEdit(index)}>Edit</button>
-            </li>
-          ))}
-        </ul>
-      )}
+      <BlogPostForm
+        post={editingPost}
+        onSubmit={handleSubmit}
+        onDelete={() => handleDelete(editingPost?.index)}
+      />
+      <hr />
+      <h2>All Posts</h2>
+      <ul>
+        {posts.map((post, index) => (
+          <li key={index}>
+            <strong>{post.title}</strong> by {post.author}{' '}
+            <button onClick={() => handleEdit(index)}>Edit</button>{' '}
+            <button onClick={() => handleDelete(index)} style={{ color: 'red' }}>
+              Delete
+            </button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
